@@ -1,0 +1,14 @@
+site: ""
+user: Kirima2nd
+repo: samp-command-guess
+entry: test.pwn
+output: test.amx
+dependencies:
+- sampctl/samp-stdlib
+- pawn-lang/YSI-Includes
+- Zeex/amx_assembly
+runtime:
+  version: 0.3.7
+  mode: server
+  rcon_password: password
+  port: 7777
