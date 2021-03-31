@@ -78,7 +78,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 		new 
 			guessCmd[32];
 		
-		CommandGuess(guessCmd, cmdtext);
+		Command_Guess(guessCmd, cmdtext);
 
 		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return COMMAND_OK;
@@ -106,13 +106,12 @@ YCMD:cd(playerid, cmdtext[])
 	return 1;
 }
 #else
-
 public OnPlayerCommandPerformed(playerid, cmdtext[], success) {
 	if (!success) {
 		new 
 			guessCmd[32];
 		
-		CommandGuess(guessCmd, cmdtext);
+		Command_Guess(guessCmd, cmdtext);
 
 		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return 1;

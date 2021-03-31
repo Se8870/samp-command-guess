@@ -76,44 +76,6 @@ hook OnGameModeInit() {
     Debug("Loaded %d Commands", g_RegisteredCommands);
 }
 
-stock CommandGuess(dest[], const cmdtext[], len = sizeof dest) {
-    new 
-        dist,
-        min_dist = 0x7FFFFFFF, 
-        min_idx = -1
-    ;
-    
-    // WARNING: Please don't edit ANYTHING on this code
-    // OR else it will cause chaos in your code
-    for (new i = 0; i <= g_RegisteredCommands + 1; i ++) {
-        Debug("Start looping at index %d", i);
-
-        if (g_CommandNames[i][0] != EOS) {
-            dist = __getDistance(cmdtext[1], g_CommandNames[i]);
-
-            Debug("Get some distance and checking if %s is closests to %s",cmdtext[1], g_CommandNames[i]);
-
-            if (dist < min_dist) {
-                min_dist = dist;
-                min_idx = i;
-
-                Debug("Found it!\n%d, %d, %d", dist, min_dist, min_idx);
-                Debug("%s", g_CommandNames[i]);
-            }
-        }
-    }
-    Debug("Showing results:\n%s, %s, %d", g_CommandNames[min_idx], cmdtext, min_idx);
-        
-    if (('A' <= cmdtext[0] <= 'Z') || ('a' <= cmdtext[0] <= 'z') || ('0' <= cmdtext[0] <= '9')) {
-        format(dest, len, g_CommandNames[min_idx]);
-    }
-    else {
-        format(dest, len, "%c%s", cmdtext[0], g_CommandNames[min_idx]);
-    }
-    return 1;
-}
-
-
 static stock __getDistance(const a[], const b[]) {
     new 
         a_len = strlen(a),
@@ -156,4 +118,41 @@ static stock __getDistance(const a[], const b[]) {
         }
     } 
     return result;
+}
+
+stock Command_Guess(dest[], const cmdtext[], len = sizeof dest) {
+    new 
+        dist,
+        min_dist = 0x7FFFFFFF, 
+        min_idx = -1
+    ;
+    
+    // WARNING: Please don't edit ANYTHING on this code
+    // OR else it will cause chaos in your code
+    for (new i = 0; i <= g_RegisteredCommands + 1; i ++) {
+        Debug("Start looping at index %d", i);
+
+        if (g_CommandNames[i][0] != EOS) {
+            dist = __getDistance(cmdtext[1], g_CommandNames[i]);
+
+            Debug("Get some distance and checking if %s is closests to %s",cmdtext[1], g_CommandNames[i]);
+
+            if (dist < min_dist) {
+                min_dist = dist;
+                min_idx = i;
+
+                Debug("Found it!\n%d, %d, %d", dist, min_dist, min_idx);
+                Debug("%s", g_CommandNames[i]);
+            }
+        }
+    }
+    Debug("Showing results:\n%s, %s, %d", g_CommandNames[min_idx], cmdtext, min_idx);
+        
+    if (('A' <= cmdtext[0] <= 'Z') || ('a' <= cmdtext[0] <= 'z') || ('0' <= cmdtext[0] <= '9')) {
+        format(dest, len, g_CommandNames[min_idx]);
+    }
+    else {
+        format(dest, len, "%c%s", cmdtext[0], g_CommandNames[min_idx]);
+    }
+    return 1;
 }

@@ -5,7 +5,6 @@
 It's just simple command guesser for SA-MP using Levenshtein Distance function
 and with tricks too!
 
-
 ## Installation
 
 Simply install to your project:
@@ -20,13 +19,11 @@ Include in your code and begin using the library:
 #include <command-guess>
 ```
 
-
 ## Function Lists
 
 ```pawn
-CommandGuess(dest[], cmdtext[], len = sizeof dest);
+Command_Guess(dest[], cmdtext[], len = sizeof dest);
 ```
-
 
 ## Usage
 
@@ -45,7 +42,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 		new 
 			guessCmd[32];
 		
-		CommandGuess(guessCmd, cmdtext);
+		Command_Guess(guessCmd, cmdtext);
 
 		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return COMMAND_OK;
@@ -67,7 +64,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success) {
 		new 
 			guessCmd[32];
 		
-		CommandGuess(guessCmd, cmdtext);
+		Command_Guess(guessCmd, cmdtext);
 
 		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return 1;
@@ -75,7 +72,6 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success) {
 	return 1;
 }
 ```
-
 
 ## Testing
 
