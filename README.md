@@ -1,4 +1,4 @@
-# SA-MP Command Guess
+# SA:MP Command Guess
 
 [![sampctl](https://img.shields.io/badge/sampctl-command--guess-2f2f2f.svg?style=for-the-badge)](https://github.com/Kirima2nd/samp-command-guess)
 
