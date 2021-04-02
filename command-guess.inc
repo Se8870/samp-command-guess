@@ -28,6 +28,7 @@
 #endif 
 
 #include <YSI_Coding\y_hooks>
+
 #tryinclude <amx_header>
 
 #if !defined _INC_y_hooks
@@ -42,7 +43,12 @@ new
     g_RegisteredCommands,
     g_CommandNames[MAX_COMMANDS][32 + 1];
 
-hook OnGameModeInit() {
+// Since this project use YSI, i guess using OnScriptInit
+// For loading the commands wasn't bad at all.
+
+// I think....
+
+hook OnScriptInit() {
     #if defined _INC_y_commands
         for (new i = 0; i != MAX_COMMANDS; i ++)
         {
