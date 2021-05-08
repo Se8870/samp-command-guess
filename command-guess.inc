@@ -4,11 +4,12 @@
 
     Credits:
         - Southclaws for Levenshtein Distance function
-        - Y_Less for y_commands
+        - Y_Less for y_hooks
         - Zeex for amx_assembly
 
-    Always put original creators first!
-
+    NOTE: When using this script as filterscripts, please use #define FILTERSCRIPT
+    otherwise it won't work. But if you have YSI Installed in your script, you don't need
+    to worry about it (i think, untested please make an issue if anything happend)
 */
 
 #if defined _INC_guess_command
@@ -17,8 +18,15 @@
 
 #define _INC_guess_command
 
+#tryinclude <YSI_Coding\y_hooks>
+#tryinclude <amx_header>
+
+#if !defined AMX_HEADER_INC
+    #error Please install both YSI and amx_assembly first before include this.
+#endif
+
 #if defined USE_DEBUG
-    #define Debug(%0) printf("[guess-command debug]: "%0)
+    #define Debug(%0) printf("[CGuess debug]: "%0)
 #else 
     #define Debug(%0);
 #endif
@@ -27,31 +35,14 @@
     #define MAX_COMMANDS 500
 #endif 
 
-#include <YSI_Coding\y_hooks>
-
-#tryinclude <amx_header>
-
-#if !defined _INC_y_hooks
-    #if !defined AMX_HEADER_INC
-        #error Please install both YSI and amx_assembly first before include this.
-    #else
-        #error Please install YSI-Includes before include this.
-    #endif
-#endif
-
 new 
     g_RegisteredCommands,
     g_CommandNames[MAX_COMMANDS][32 + 1];
 
-// Since this project use YSI, i guess using OnScriptInit
-// For loading the commands wasn't bad at all.
-
-// I think....
-
+#if defined _INC_y_hooks
 hook OnScriptInit() {
     #if defined _INC_y_commands
-        for (new i = 0; i != MAX_COMMANDS; i ++)
-        {
+        for (new i = 0; i != MAX_COMMANDS; i ++) {
             if (Command_IsValid(i)) {
                 strcat(g_CommandNames[i], Command_GetName(i));
                 g_RegisteredCommands ++;
@@ -81,6 +72,107 @@ hook OnScriptInit() {
     #endif
     Debug("Loaded %d Commands", g_RegisteredCommands);
 }
+#else
+    #if !defined FILTERSCRIPT
+        public OnGameModeInit()
+        {
+            #if defined _INC_y_commands
+                for (new i = 0; i != MAX_COMMANDS; i ++) {
+                    if (Command_IsValid(i)) {
+                        strcat(g_CommandNames[i], Command_GetName(i));
+                        g_RegisteredCommands ++;
+                    }
+                }
+            #else
+                new 
+                    hdr[AMX_HDR];
+
+                GetAmxHeader(hdr);
+
+                for (new i = 0, j = GetNumPublics(hdr); i < j; i ++)
+                {
+                    new tmp_name[32 + 1];
+                    GetPublicNameFromIndex(i, tmp_name);
+                    
+                    if (!strfind(tmp_name, "cmd_", false)) {
+                        if (i < MAX_COMMANDS) {
+                            format(g_CommandNames[i], 32, tmp_name[4]);
+
+                            Debug("%s", g_CommandNames[i]);
+                            Debug("%d", g_RegisteredCommands);
+                            g_RegisteredCommands ++;
+                        }
+                    }
+                }
+            #endif
+            Debug("Loaded %d Commands", g_RegisteredCommands);
+            #if defined CGuess_OnGameModeInit
+                return CGuess_OnGameModeInit();
+            #else
+                return 1;
+            #endif
+        }
+        #if defined _ALS_OnGameModeInit
+            #undef OnGameModeInit
+        #else
+            #define _ALS_OnGameModeInit
+        #endif
+
+        #define OnGameModeInit CGuess_OnGameModeInit
+        #if defined CGuess_OnGameModeInit
+            forward CGuess_OnGameModeInit();
+        #endif
+    #else
+        public OnFilterScriptInit()
+        {
+            #if defined _INC_y_commands
+                for (new i = 0; i != MAX_COMMANDS; i ++) {
+                    if (Command_IsValid(i)) {
+                        strcat(g_CommandNames[i], Command_GetName(i));
+                        g_RegisteredCommands ++;
+                    }
+                }
+            #else
+                new 
+                    hdr[AMX_HDR];
+
+                GetAmxHeader(hdr);
+
+                for (new i = 0, j = GetNumPublics(hdr); i < j; i ++)
+                {
+                    new tmp_name[32 + 1];
+                    GetPublicNameFromIndex(i, tmp_name);
+                    
+                    if (!strfind(tmp_name, "cmd_", false)) {
+                        if (i < MAX_COMMANDS) {
+                            format(g_CommandNames[i], 32, tmp_name[4]);
+
+                            Debug("%s", g_CommandNames[i]);
+                            Debug("%d", g_RegisteredCommands);
+                            g_RegisteredCommands ++;
+                        }
+                    }
+                }
+            #endif
+            Debug("Loaded %d Commands", g_RegisteredCommands);
+            #if defined CGuess_OnFilterScriptInit
+                return CGuess_OnFilterScriptInit();
+            #else
+                return 1;
+            #endif
+        }
+        #if defined _ALS_OnFilterScriptInit
+            #undef OnFilterScriptInit
+        #else
+            #define _ALS_OnFilterScriptInit
+        #endif
+        
+        #define OnFilterScriptInit CGuess_OnFilterScriptInit
+        #if defined CGuess_OnFilterScriptInit
+            forward CGuess_OnFilterScriptInit();
+        #endif
+    #endif
+#endif
 
 static stock __getDistance(const a[], const b[]) {
     new 
@@ -153,7 +245,7 @@ stock Command_Guess(dest[], const cmdtext[], len = sizeof dest) {
         }
     }
     Debug("Showing results:\n%s, %s, %d", g_CommandNames[min_idx], cmdtext, min_idx);
-        
+   
     if (('A' <= cmdtext[0] <= 'Z') || ('a' <= cmdtext[0] <= 'z') || ('0' <= cmdtext[0] <= '9')) {
         format(dest, len, g_CommandNames[min_idx]);
     }
