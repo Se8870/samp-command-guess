@@ -4,15 +4,17 @@
 #define YSI_NO_MODE_CACHE
 #define YSI_NO_OPTIMISATION_MESSAGE
 #define YSI_NO_VERSION_CHECK
+
 #define USE_DEBUG
 
-#include <YSI_Coding\y_va>
+//#include <YSI_Coding\y_va>
 //#include <YSI_Visual\y_commands>
 
-#include <zcmd>
+#include <izcmd>
 #include "command-guess.inc"
 
-main() {
+main() 
+{
 	print("Testing...");
 }
 
@@ -63,6 +65,7 @@ public OnGameModeInit()
 	return 1;
 }
 
+#if defined _INC_y_va
 SendClientMessageEx(playerid, color, const message[], GLOBAL_TAG_TYPES:...) {
 	new 
 		str[144];
@@ -71,6 +74,7 @@ SendClientMessageEx(playerid, color, const message[], GLOBAL_TAG_TYPES:...) {
 	SendClientMessage(playerid, color, str);
 	return 1;
 }
+#endif
 
 #if defined _INC_y_commands
 public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success) {
@@ -80,7 +84,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 		
 		Command_Guess(guessCmd, cmdtext);
 
-		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
+		//SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return COMMAND_OK;
 	}
 	return COMMAND_OK;
@@ -113,7 +117,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success) {
 		
 		Command_Guess(guessCmd, cmdtext);
 
-		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
+		//SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
 		return 1;
 	}
 	return 1;
