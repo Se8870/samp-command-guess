@@ -5,6 +5,8 @@
 It's just simple command guesser for SA-MP using Levenshtein Distance function
 and with tricks too!
 
+And it's working even without YSI, yaay!
+
 ## Installation
 
 Simply install to your project:
@@ -16,13 +18,16 @@ sampctl package install Kirima2nd/samp-command-guess
 Include in your code and begin using the library:
 
 ```pawn
+// uncomment the line below if you want to write a filterscript
+//#define FILTERSCRIPT
+
 #include <command-guess>
 ```
 
 ## Function Lists
 
 ```pawn
-Command_Guess(dest[], cmdtext[], len = sizeof dest);
+Command_Guess(dest[], const cmdtext[], len = sizeof dest);
 ```
 
 ## Usage
@@ -51,7 +56,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 }
 ```
 
-### With ZCMD
+### With ZCMD (And other commands that have cmd__ prefixes)
 ```pawn
 #include <a_samp>
 #include <command-guess>
