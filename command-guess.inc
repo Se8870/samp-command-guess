@@ -17,7 +17,7 @@
 #tryinclude <YSI_Coding\y_hooks>
 #tryinclude <amx_header>
 
-#if !defined AMX_HEADER_INC && _INC_y_hooks
+#if !defined AMX_HEADER_INC && !defined _INC_y_hooks
     #error Please install both YSI and amx_assembly first before include this.
 #endif
 
