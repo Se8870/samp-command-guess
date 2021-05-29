@@ -84,7 +84,5 @@ To test, simply run the following commands:
 
 ```bash
 sampctl package ensure
-sampctl package install pawn-lang/YSI-Includes@5.x
-sampctl package install YashasSamaga/I-ZCMD
 sampctl package run --forceBuild
 ```
