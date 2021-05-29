@@ -18,9 +18,6 @@ sampctl package install Kirima2nd/samp-command-guess
 Include in your code and begin using the library:
 
 ```pawn
-// uncomment the line below if you want to write a filterscript
-//#define FILTERSCRIPT
-
 #include <command-guess>
 ```
 
