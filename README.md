@@ -5,8 +5,6 @@
 It's just simple command guesser for SA-MP using Levenshtein Distance function
 and with tricks too!
 
-And it's working even without YSI, yaay!
-
 ## Installation
 
 Simply install to your project:
