@@ -22,7 +22,7 @@ Include in your code and begin using the library:
 ## Function Lists
 
 ```pawn
-Command_Guess(dest[], const cmdtext[], len = sizeof dest);
+Command_Guess(output[], const cmdtext[], len = sizeof dest);
 ```
 
 ## Usage
@@ -33,12 +33,15 @@ Command_Guess(dest[], const cmdtext[], len = sizeof dest);
 #include <YSI_Visual\y_commands>
 #include <command-guess>
 
-main() {
+main() 
+{
     print("Script loaded");
 }
 
-public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success) {
-	if (success == COMMAND_UNDEFINED) {
+public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success) 
+{
+	if (success == COMMAND_UNDEFINED) 
+	{
 		new 
 			guessCmd[32];
 		
@@ -56,11 +59,14 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 #include <a_samp>
 #include <command-guess>
 
-main() {
+main() 
+{
     print("Script loaded");
 }
-public OnPlayerCommandPerformed(playerid, cmdtext[], success) {
-	if (!success) {
+public OnPlayerCommandPerformed(playerid, cmdtext[], success) 
+{
+	if (!success) 
+	{
 		new 
 			guessCmd[32];
 		
