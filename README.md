@@ -2,8 +2,9 @@
 
 [![sampctl](https://img.shields.io/badge/sampctl-command--guess-2f2f2f.svg?style=for-the-badge)](https://github.com/Kirima2nd/samp-command-guess)
 
-It's just simple command guesser for SA-MP using Levenshtein Distance function
-and with tricks too!
+It's just simple command guesser for SA-MP using Levenshtein Distance function.
+
+It will work with most of command processor (including y_commands and also discord command)
 
 ## Installation
 
@@ -54,9 +55,10 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 }
 ```
 
-### With ZCMD (And other commands that have cmd__ prefixes)
+### With most command processor (In this example, i'll be using izcmd instead)
 ```pawn
 #include <a_samp>
+#include <izcmd>
 #include <command-guess>
 
 main() 
@@ -84,6 +86,5 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 To test, simply run the following commands:
 
 ```bash
-sampctl package ensure
-sampctl package run --forceBuild
+sampctl package run
 ```
