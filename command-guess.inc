@@ -4,7 +4,6 @@
 
     Credits:
         - Southclaws for Levenshtein Distance function
-        - Y_Less for y_hooks
         - Zeex for amx_assembly
 */
 
@@ -14,137 +13,214 @@
 
 #define _INC_guess_command
 
-#tryinclude <YSI_Coding\y_hooks>
-#tryinclude <amx_header>
-
-#if !defined AMX_HEADER_INC && !defined _INC_y_hooks
-    #error Please install both YSI and amx_assembly first before include this.
-#endif
-
-#if defined USE_DEBUG
-    #define Debug(%0) printf("[CGuess debug]: "%0)
-#else 
-    #define Debug(%0);
-#endif
+#include <string>
+#include <amx_header>
 
 #if !defined MAX_COMMANDS
     #define MAX_COMMANDS 500
 #endif 
 
-new 
-    g_RegisteredCommands,
-    g_CommandNames[MAX_COMMANDS][32 + 1];
+static stock
+    g_sRegisteredCommands = -1,
+    g_sCommandName[MAX_COMMANDS][32 + 1];
 
-hook OnScriptInit() {
-    #if defined _INC_y_commands
-        for (new i = 0; i != MAX_COMMANDS; i ++) {
-            if (Command_IsValid(i)) {
-                strcat(g_CommandNames[i], Command_GetName(i));
-                g_RegisteredCommands ++;
-            }
-        }
-    #else
-        new 
-            hdr[AMX_HDR];
 
-        GetAmxHeader(hdr);
-
-        for (new i = 0, j = GetNumPublics(hdr); i < j; i ++)
-        {
-            new tmp_name[32 + 1];
-            GetPublicNameFromIndex(i, tmp_name);
-            
-            if (!strfind(tmp_name, "cmd_", false)) {
-                if (i < MAX_COMMANDS) {
-                    format(g_CommandNames[i], 32, tmp_name[4]);
-
-                    Debug("%s", g_CommandNames[i]);
-                    Debug("%d", g_RegisteredCommands);
-                    g_RegisteredCommands ++;
-                }
-            }
-        }
-    #endif
-    Debug("Loaded %d Commands", g_RegisteredCommands);
-}
-
-static stock __getDistance(const a[], const b[]) {
-    new 
-        a_len = strlen(a),
-        b_len = strlen(b),
-        cache[256],
-        a_idx,
-        b_idx,
-        a_dist,
-        b_dist,
-        result,
-        code
-    ;
-
-    if (!strcmp(a, b)) return 0;
-    if (a_len == 0) return b_len;
-    if (b_len == 0) return a_len;
-
-    while(a_idx < a_len) {
-
-        cache[a_idx] = a_idx + 1;
-        a_idx ++;
-    }
-
-    while(b_idx < b_len) {
-		code = b[b_idx];
-		result = a_dist = b_idx++;
-		a_idx = -1;
-
-		while (++a_idx < a_len) {
-			b_dist = code == a[a_idx] ? a_dist : a_dist + 1;
-			a_dist = cache[a_idx];
-
-			cache[a_idx] = result = a_dist > result
-			? b_dist > result
-				? result + 1
-				: b_dist
-			: b_dist > a_dist
-				? a_dist + 1
-				: b_dist;
-        }
-    } 
-    return result;
-}
-
-stock Command_Guess(dest[], const cmdtext[], len = sizeof dest) {
+stock Command_Guess(output[], const cmdtext[], len = sizeof output)
+{
     new 
         dist,
         min_dist = 0x7FFFFFFF, 
         min_idx = -1
     ;
-    
-    // WARNING: Please don't edit ANYTHING on this code
-    // OR else it will cause chaos in your code
-    for (new i = 0; i <= g_RegisteredCommands + 1; i ++) {
-        Debug("Start looping at index %d", i);
 
-        if (g_CommandNames[i][0] != EOS) {
-            dist = __getDistance(cmdtext[1], g_CommandNames[i]);
+    for (new i = 0; i <= g_sRegisteredCommands; i ++)
+    {
+        dist = getDistance(cmdtext[1], g_sCommandName[i]);
 
-            Debug("Get some distance and checking if %s is closests to %s",cmdtext[1], g_CommandNames[i]);
-
-            if (dist < min_dist) {
-                min_dist = dist;
-                min_idx = i;
-
-                Debug("Found it!\n%d, %d, %d", dist, min_dist, min_idx);
-                Debug("%s", g_CommandNames[i]);
-            }
+        if (dist < min_dist)
+        {
+            min_dist = dist;
+            min_idx = i;
         }
     }
-    Debug("Showing results:\n%s, %s, %d", g_CommandNames[min_idx], cmdtext, min_idx);
-   
-    if (('A' <= cmdtext[0] <= 'Z') || ('a' <= cmdtext[0] <= 'z') || ('0' <= cmdtext[0] <= '9')) {
-        format(dest, len, g_CommandNames[min_idx]);
+
+    if (('A' <= cmdtext[0] <= 'Z') || ('a' <= cmdtext[0] <= 'z') || ('0' <= cmdtext[0] <= '9')) 
+    {
+        format(output, len, g_sCommandName[min_idx]);
     }
-    else {
-        format(dest, len, "%c%s", cmdtext[0], g_CommandNames[min_idx]);
+    else 
+    {
+        format(output, len, "%c%s", cmdtext[0], g_sCommandName[min_idx]);
     }
     return 1;
 }
+
+static CGuess_Init()
+{
+    #if defined _INC_y_commands
+        for (new i = 0; i < MAX_COMMANDS; i ++)
+        {
+            if (Command_IsValid(i))
+            {
+                g_sRegisteredCommands ++;
+                format(g_sCommandName[g_sRegisteredCommands], 32, "%s", Command_GetName(i)));
+            }
+        }
+    #else
+        new 
+            hdr[AMX_HDR];
+        
+        GetAmxHeader(hdr);
+
+        for (new i = 0, j = GetNumPublics(hdr); i < j; i ++)
+        {
+            new 
+                trimmedPos,
+                tmpName[32 + 1];
+
+            GetPublicNameFromIndex(i, tmpName);
+            
+            if ((trimmedPos = IsValidCommandName(tmpName)) == -1)
+            {
+                continue;
+            }
+            else
+            {
+                if (i < MAX_COMMANDS)
+                {
+                    g_sRegisteredCommands ++;
+                    format(g_sCommandName[g_sRegisteredCommands], 32, "%s", tmpName[trimmedPos]);
+                }
+            }
+        }
+    #endif
+    return 1;
+}
+
+// using 130000 BC method, will give you correct starting index of cmds
+static IsValidCommandName(const commandName[])
+{
+    if (strfind(commandName, "cmd", true) != -1)
+        return 4;
+
+    if (strfind(commandName, "cmd_", true) != -1)
+        return 5;
+
+    if (strfind(commandName, "dc_cmd", true) != -1)
+        return 7;
+
+    if (strfnd(commandName, "dcmd", true) != -1)
+        return 5;
+
+    if (strfind(commandName, "dcmd_", true) != -1)
+        return 6;
+
+    if (strfind(commandName, "_dcmd@", true) != -1)
+        return 7;
+
+    return -1;
+}
+
+static getDistance(const a[], const b[]) {
+	new
+		aLength = strlen(a),
+		bLength = strlen(b),
+		cache[256],
+		index = 0,
+		bIndex = 0,
+		distance,
+		bDistance,
+		result,
+		code;
+
+	if (!strcmp(a, b)) {
+		return 0;
+	}
+
+	if (aLength == 0) {
+		return bLength;
+	}
+
+	if (bLength == 0) {
+		return aLength;
+	}
+
+	while (index < aLength) {
+		cache[index] = index + 1;
+		index++;
+	}
+
+	while (bIndex < bLength) {
+		code = b[bIndex];
+		result = distance = bIndex++;
+		index = -1;
+
+		while (++index < aLength) {
+			bDistance = code == a[index] ? distance : distance + 1;
+			distance = cache[index];
+
+			cache[index] = result = distance > result
+			? bDistance > result
+				? result + 1
+				: bDistance
+			: bDistance > distance
+				? distance + 1
+				: bDistance;
+		}
+	}
+
+	return result;
+}
+
+static stock 
+    g_sScriptIndicator = false;
+
+public OnGameModeInit()
+{
+    if (!g_sScriptIndicator)
+    {
+        CGuess_Init();
+        g_sScriptIndicator = true;
+    }
+    #if defined CGuess_OnGameModeInit
+        return CGuess_OnGameModeInit();
+    #else
+        return 1;
+    #endif
+}
+
+public OnFilterScriptInit()
+{
+    if (!g_sScriptIndicator)
+    {
+        CGuess_Init();
+        g_sScriptIndicator = true;
+    }
+    #if defined CGuess_OnFilterScriptInit
+        return CGuess_OnFilterScriptInit();
+    #else
+        return 1;
+    #endif
+}
+
+#if defined _ALS_OnGameModeInit
+    #undef OnGameModeInit
+#else
+    #define _ALS_OnGameModeInit
+#endif
+
+#define OnGameModeInit CGuess_OnGameModeInit
+#if defined CGuess_OnGameModeInit
+    forward CGuess_OnGameModeInit();
+#endif
+
+#if defined _ALS_OnFilterScriptInit
+    #undef OnFilterScriptInit
+#else
+    #define _ALS_OnFilterScriptInit
+#endif
+
+#define OnFilterScriptInit CGuess_OnFilterScriptInit
+#if defined CGuess_OnFilterScriptInit
+    forward CGuess_OnFilterScriptInit();
+#endif
