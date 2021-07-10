@@ -4,5 +4,5 @@ repo: samp-command-guess
 entry: test.pwn
 output: test.amx
 dependencies:
-  - sampctl/samp-stdlib
-  - Zeex/amx_assembly
+- sampctl/samp-stdlib
+- Zeex/amx_assembly
