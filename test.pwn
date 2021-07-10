@@ -6,7 +6,7 @@
 main() 
 {
 	new 
-		guessedCmd[32];
+	    guessedCmd[32];
 
 	print("Testing...");
 
@@ -30,4 +30,4 @@ main()
 CMD:help(playerid, cmdtext[]) return 1;
 CMD:cmds(playerid, cmdtext[]) return 1;
 CMD:cmd(playerid, cmdtext[]) return 1;
-CMD:cd(playerid, cmdtext[])	return 1;
+CMD:cd(playerid, cmdtext[]) return 1;
