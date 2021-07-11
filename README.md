@@ -81,6 +81,14 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 }
 ```
 
+## Notes
+
+I also created no limit version for most of command processors but not y_commands because you need to increase the MAX_COMMAND. Thus it may lag your server so use it if you think this is needed.
+
+https://gist.github.com/Kirima2nd/f2c87792b659e69aee8569bc8647d38e
+
+I want to merge this into main lib, but it looks like going to bloat and it's only simple implementations tbh.
+
 ## Testing
 
 To test, simply run the following commands:
