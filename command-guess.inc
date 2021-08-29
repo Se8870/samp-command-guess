@@ -109,7 +109,7 @@ static IsValidCommandName(const commandName[])
     if (strfind(commandName, "dc_cmd", true) != -1)
         return 7;
 
-    if (strfnd(commandName, "dcmd", true) != -1)
+    if (strfind(commandName, "dcmd", true) != -1)
         return 5;
 
     if (strfind(commandName, "dcmd_", true) != -1)
