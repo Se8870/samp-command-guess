@@ -13,6 +13,18 @@
 
 #define _INC_guess_command
 
+/*
+    MAX_COMMANDS
+    -------------
+    This pre-processor will be used if there is no maximum commaands when using izcmd or simillar
+    Because they're designed to bypass the limitation and decided to use the string that user
+    input.
+*/
+
+#if !defined MAX_COMMANDS
+    #define MAX_COMMANDS 500
+#endif
+
 #if !defined _INC_a_samp
     #error Please include a_samp before using this
 #endif
@@ -30,42 +42,41 @@
     #if !defined AMX_HEADER_INC
         #error "Cannot find amx_header.inc, please download it from https://github.com/Zeex/amx_assembly"
     #endif
-#endif
-
-/*
-    MAX_COMMANDS
-    -------------
-    This pre-processor will be used if there is no maximum commaands when using izcmd or simillar
-    Because they're designed to bypass the limitation and decided to use the string that user
-    input.
-*/
-
-#if !defined MAX_COMMANDS
-    #define MAX_COMMANDS 500
-#endif
  
- /*
-    CGUESS_CMD_FUNC
-    -------------
-    This pre-processor is used for finding the right length of one of these internal functions below
-    You also can add another one using `#define CGUESS_CUSTOM_CMD_FUNC` before including `command_guess.inc`
- 
-    Example Code:
+    /*
+        CGUESS_CMD_FUNC
+        -------------
+        This pre-processor is used for finding the right length of one of these internal functions below
+        You also can add another one using `#define CGUESS_CUSTOM_CMD_FUNC` before including `command_guess.inc`
 
-    ```pawn
-    #define CGUESS_CUSTOM_CMD_FUNC "ahcmd_", "bonk_cmd", "loli_cmd@"
-    #include <command_guess>
-    ```
-*/
+        Example Code:
 
-#if !defined CGUESS_CORE_CMD_FUNC
-    #define CGUESS_CORE_CMD_FUNC "cmd", "cmd_", "dc_cmd", "dcmd", "dcmd_", "_dcmd@", "kcmd_", "_kcmd@"
-#endif
+        ```pawn
+        #define CGUESS_CUSTOM_CMD_FUNC "ahcmd_", "bonk_cmd", "loli_cmd@"
+        #include <command_guess>
+        ```
+    */
 
-#if !defined CGUESS_CUSTOM_CMD_FUNC
-    #define CGUESS_CMD_FUNC CGUESS_CORE_CMD_FUNC
-#else
-    #define CGUESS_CMD_FUNC CGUESS_CORE_CMD_FUNC, CGUESS_CUSTOM_CMD_FUNC
+    #if !defined CGUESS_CORE_CMD_FUNC
+        #define CGUESS_CORE_CMD_FUNC "cmd", "cmd_", "dc_cmd", "dcmd", "dcmd_", "_dcmd@", "kcmd_", "_kcmd@"
+    #endif
+
+    #if !defined CGUESS_CUSTOM_CMD_FUNC
+        #define CGUESS_CMD_FUNC CGUESS_CORE_CMD_FUNC
+    #else
+        #define CGUESS_CMD_FUNC CGUESS_CORE_CMD_FUNC, CGUESS_CUSTOM_CMD_FUNC
+    #endif
+
+
+    /*
+        Command Internal Name
+        ----------------------
+        This variable can be used for holding the command internal name and adding it for looping stuff.
+        Each command processor have it's own unique internal name, so that's why i'm using this instead of
+        Trying to use dumb method from 3000 BC.
+    */
+
+    static stock g_arrCmdInternalName[][32 + 1] = {CGUESS_CMD_FUNC};
 #endif
 
  /*
@@ -79,16 +90,6 @@
 static stock
     g_sRegisteredCommands = -1,
     g_sCommandName[MAX_COMMANDS][32 + 1];
-
- /*
-    Command Internal Name
-    ----------------------
-    This variable can be used for holding the command internal name and adding it for looping stuff.
-    Each command processor have it's own unique internal name, so that's why i'm using this instead of
-    Trying to use dumb method from 3000 BC.
-*/
-
-static stock g_arrCmdInternalName[][32 + 1] = {CGUESS_CMD_FUNC};
 
 /*
     <summary>This function will try to search available command and make a prediction to guess the right command.</summary>
@@ -127,30 +128,6 @@ stock Command_Guess(output[], const cmdtext[], len = sizeof output)
         format(output, len, "%c%s", cmdtext[0], g_sCommandName[min_idx]);
     }
     return min_dist;
-}
-
-
-/*
-    <summary>This internal function was used for checking the command internal function name.</summary>
-    <param name="commandname">The command function name that is used for checking</param>
-    <seealso name="CGuess_Init" />
-    <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
-*/
-
-static CGuess_CheckInternalFunc(const commandName[])
-{
-    // strcmp check is case sensitive, to catch any weird names.
-    for (new i = 0, j = sizeof(g_arrCmdInternalName); i < j; i ++)
-    {
-        new 
-            cmdLen = strlen(g_arrCmdInternalName[i]);
-
-        if (!strcmp(commandName, g_arrCmdInternalName[i], true, cmdLen))
-        {
-            return cmdLen + 1;
-        }
-    }
-    return -1;
 }
 
 /*
@@ -270,6 +247,31 @@ public OnFilterScriptInit()
 #define OnFilterScriptInit CGuess_OnFilterScriptInit
 #if defined CGuess_OnFilterScriptInit
     forward CGuess_OnFilterScriptInit();
+#endif
+
+#if !defined _INC_y_commands
+    /*
+        <summary>This internal function was used for checking the command internal function name.</summary>
+        <param name="commandname">The command function name that is used for checking</param>
+        <seealso name="CGuess_Init" />
+        <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
+    */
+
+    static CGuess_CheckInternalFunc(const commandName[])
+    {
+        // strcmp check is case sensitive, to catch any weird names.
+        for (new i = 0, j = sizeof(g_arrCmdInternalName); i < j; i ++)
+        {
+            new 
+                cmdLen = strlen(g_arrCmdInternalName[i]);
+
+            if (!strcmp(commandName, g_arrCmdInternalName[i], true, cmdLen))
+            {
+                return cmdLen + 1;
+            }
+        }
+        return -1;
+    }
 #endif
 
 /*
