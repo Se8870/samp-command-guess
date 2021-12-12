@@ -2,9 +2,9 @@
 
 [![sampctl](https://img.shields.io/badge/sampctl-command--guess-2f2f2f.svg?style=for-the-badge)](https://github.com/Kirima2nd/samp-command-guess)
 
-It's just simple command guesser for SA-MP using Levenshtein Distance function.
+Just simple command guesser for SA-MP using Levenshtein Distance function.
 
-It will work with most of command processor (including y_commands and also discord command)
+Will working with most of command processor (including y_commands and also discord command)
 
 ## Installation
 
@@ -37,27 +37,36 @@ Command_Guess(output[], const cmdtext[], len = sizeof dest);
 main() 
 {
     print("Script loaded");
+    
+    Command_SetDeniedReturn(true);
 }
 
 public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success) 
 {
-	if (success == COMMAND_UNDEFINED) 
-	{
-		new 
-			guessCmd[32];
-		
-		Command_Guess(guessCmd, cmdtext);
-
-		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
-		return COMMAND_OK;
-	}
-	return COMMAND_OK;
+    if (success == COMMAND_UNDEFINED) 
+    {
+        new 
+            guessCmd[32], 
+            dist = Command_Guess(guessCmd, cmdtext);
+  
+        if (dist < 3)
+        {
+            SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
+        }
+        else
+        {
+            SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found", cmdtext);
+        }
+        return COMMAND_SILENT;
+    }
+    return COMMAND_OK;
 }
 ```
 
-### With most command processor (In this example, i'll be using izcmd instead)
+### With most command processor (I-ZCMD Example)
 ```pawn
 #include <a_samp>
+
 #include <izcmd>
 #include <command-guess>
 
@@ -67,27 +76,25 @@ main()
 }
 public OnPlayerCommandPerformed(playerid, cmdtext[], success) 
 {
-	if (!success) 
-	{
-		new 
-			guessCmd[32];
-		
-		Command_Guess(guessCmd, cmdtext);
+    if (!success) 
+    {
+        new 
+            guessCmd[32],
+            dist = Command_Guess(guessCmd, cmdtext);
 
-		SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
-		return 1;
-	}
-	return 1;
+        if (dist < 3)
+        {
+            SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found, did you mean \"%s\"?", cmdtext, guessCmd);
+        }
+        else
+        {
+            SendClientMessageEx(playerid, -1, "{FF0000}ERROR:{FFFFFF} \"%s\" is not found", cmdtext);
+        }
+        return 1;
+    }
+    return 1;
 }
 ```
-
-## Notes
-
-I also created no limit version for most of command processors but not y_commands because you need to increase the MAX_COMMAND. Thus it may lag your server so use it if you think this is needed.
-
-https://gist.github.com/Kirima2nd/f2c87792b659e69aee8569bc8647d38e
-
-I want to merge this into main lib, but it looks like going to bloat and it's only simple implementations tbh.
 
 ## Testing
 
