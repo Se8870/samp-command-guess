@@ -8,11 +8,24 @@ Will working with most of command processor (including y_commands and also disco
 
 ## Installation
 
+### Using sampctl
+
 Simply install to your project:
 
 ```bash
 sampctl package install Kirima2nd/samp-command-guess
 ```
+
+Include in your code and begin using the library:
+
+```pawn
+#include <command-guess>
+```
+
+### Manual installation
+Simply download it from main repository, or go to [release](../../releases) page.
+
+Extract `command.guess.inc` inside the zip or tar.gz to your server directory (It should be inside `pawno/includes`)
 
 Include in your code and begin using the library:
 
