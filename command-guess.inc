@@ -29,6 +29,11 @@
     #error Please include a_samp before using this
 #endif
 
+#if !defined strcopy
+    stock strcopy(dest[], const source[], maxlength=sizeof dest)
+	    return strcat((dest[0] = EOS, dest), source, maxlength);
+#endif
+
 #if !defined _INC_y_commands
     #if !defined AMX_HEADER_INC
         #tryinclude <amx_header>
@@ -249,30 +254,28 @@ public OnFilterScriptInit()
     forward CGuess_OnFilterScriptInit();
 #endif
 
-#if !defined _INC_y_commands
-    /*
-        <summary>This internal function was used for checking the command internal function name.</summary>
-        <param name="commandname">The command function name that is used for checking</param>
-        <seealso name="CGuess_Init" />
-        <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
-    */
+/*
+    <summary>This internal function was used for checking the command internal function name.</summary>
+    <param name="commandname">The command function name that is used for checking</param>
+    <seealso name="CGuess_Init" />
+    <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
+*/
 
-    static CGuess_CheckInternalFunc(const commandName[])
+static stock CGuess_CheckInternalFunc(const commandName[])
+{
+    // strcmp check is case sensitive, to catch any weird names.
+    for (new i = 0, j = sizeof(g_arrCmdInternalName); i < j; i ++)
     {
-        // strcmp check is case sensitive, to catch any weird names.
-        for (new i = 0, j = sizeof(g_arrCmdInternalName); i < j; i ++)
-        {
-            new 
-                cmdLen = strlen(g_arrCmdInternalName[i]);
+        new 
+	    cmdLen = strlen(g_arrCmdInternalName[i]);
 
-            if (!strcmp(commandName, g_arrCmdInternalName[i], true, cmdLen))
-            {
-                return cmdLen + 1;
-            }
+        if (!strcmp(commandName, g_arrCmdInternalName[i], true, cmdLen))
+        {
+	    return cmdLen + 1;
         }
-        return -1;
     }
-#endif
+    return -1;
+}
 
 /*
     <summary>This was used for caching the commands as many as possible</summary>
