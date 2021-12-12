@@ -278,7 +278,7 @@ public OnFilterScriptInit()
     <remarks>The code may get slower depending on how many command did you have.
     You can always increase `MAX_COMMANDS` by adding `#define MAX_COMMANDS (number)` 
     to cache more commands before including command-guess.inc</remarks>
-    <returns><b><c>1</c></b> success, <b><c>0</c></b> failed
+    <returns>This function doesn't have any return types</returns>
 */
 
 static CGuess_Init()
