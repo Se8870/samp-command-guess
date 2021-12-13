@@ -1,6 +1,7 @@
 #include <a_samp>
-#include <izcmd>
+//#include <izcmd>
 
+#include <YSI_Visual\y_commands>
 #include "command-guess.inc"
 
 main() 
