@@ -13,18 +13,6 @@
 
 #define _INC_guess_command
 
-/*
-    MAX_COMMANDS
-    -------------
-    This pre-processor will be used if there is no maximum commaands when using izcmd or simillar
-    Because they're designed to bypass the limitation and decided to use the string that user
-    input.
-*/
-
-#if !defined MAX_COMMANDS
-    #define MAX_COMMANDS 500
-#endif
-
 #if !defined _INC_a_samp
     #error Please include a_samp before using this
 #endif
@@ -34,7 +22,17 @@
 	    return strcat((dest[0] = EOS, dest), source, maxlength);
 #endif
 
-#if !defined _INC_y_commands
+#if defined _INC_y_commands
+    #if !defined _INC_y_iterate
+        #tryinclude <YSI_Data\y_foreach>
+    #endif
+    #if !defined _INC_y_iterate
+        #tryinclude <YSI\y_foreach>
+    #endif
+    #if !defined _INC_y_iterate
+        #error "Cannot find y_iterate/y_foreach"
+    #endif
+#else
     #if !defined AMX_HEADER_INC
         #tryinclude <amx_header>
     #endif
@@ -84,6 +82,22 @@
     static stock g_arrCmdInternalName[][32 + 1] = {CGUESS_CMD_FUNC};
 #endif
 
+/*
+    CGUESS_MAX_CACHE_COMMAND
+    -------------
+    This pre-processor will be used if there is no maximum commaands when using izcmd or simillar
+    Because they're designed to bypass the limitation and decided to use the string that user
+    input.
+*/
+
+#if !defined CGUESS_MAX_CACHE_COMMAND
+    #if defined MAX_COMMANDS
+        #define CGUESS_MAX_CACHE_COMMAND MAX_COMMANDS
+    #else
+        #define CGUESS_MAX_CACHE_COMMAND 500
+    #endif
+#endif
+
  /*
     Command Storage
     ----------------
@@ -94,17 +108,20 @@
 
 static stock
     g_sRegisteredCommands = -1,
-    g_sCommandName[MAX_COMMANDS][32 + 1];
+    g_sCommandName[CGUESS_MAX_CACHE_COMMAND][32 + 1];
 
-/*
-    <summary>This function will try to search available command and make a prediction to guess the right command.</summary>
-    <param name="output">Used for storing the results into your variable</param>
-    <param name="cmdtext">The failed command that is used for guessing</param>
-    <param name="len">Length of your output</param>
-    <returns>Minimum distance between available command and the command from cmdtext</returns>
+/**
+ *   <summary>This function will try to search available command and make a prediction to guess the right command.</summary>
+ *   <param name="output">Used for storing the results into your variable</param>
+ *   <param name="cmdtext">The failed command that is used for guessing</param>
+ *   <param name="len">Length of your output</param>
+ *   <returns>Minimum distance between available command and the command from cmdtext</returns>
  */
 
-/*This function will try to search available command and make a prediction to guess the right command.*/
+ /*
+    This function will try to search available command and make a prediction to guess the right command. 
+    Returns: Minimum distance between available command and the command from cmdtext
+ */
 stock Command_Guess(output[], const cmdtext[], len = sizeof output)
 {
     new 
@@ -135,12 +152,12 @@ stock Command_Guess(output[], const cmdtext[], len = sizeof output)
     return min_dist;
 }
 
-/*
-    <summary>This was used for getting the distance between two strings using Levenshtein Distance method</summary>
-    <param name="a">The first string</param>
-    <param name="b">The second string</param>
-    <seealso name="CGuess_Init" />
-    <returns>The distance between two strings</returns>
+/**
+ *   <summary>This was used for getting the distance between two strings using Levenshtein Distance method</summary>
+ *   <param name="a">The first string</param>
+ *   <param name="b">The second string</param>
+ *   <seealso name="CGuess_Init" />
+ *   <returns>The distance between two strings</returns>
 */
 
 static CGuess_GetDistance(const a[], const b[]) {
@@ -254,11 +271,11 @@ public OnFilterScriptInit()
     forward CGuess_OnFilterScriptInit();
 #endif
 
-/*
-    <summary>This internal function was used for checking the command internal function name.</summary>
-    <param name="commandname">The command function name that is used for checking</param>
-    <seealso name="CGuess_Init" />
-    <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
+/**
+ *   <summary>This internal function was used for checking the command internal function name.</summary>
+ *   <param name="commandname">The command function name that is used for checking</param>
+ *   <seealso name="CGuess_Init" />
+ *   <returns>the size of internal function name length, or <b><c>-1</c></b> if it's not found</returns>
 */
 
 static stock CGuess_CheckInternalFunc(const commandName[])
@@ -277,24 +294,28 @@ static stock CGuess_CheckInternalFunc(const commandName[])
     return -1;
 }
 
-/*
-    <summary>This was used for caching the commands as many as possible</summary>
-    <param name=""></param>
-    <remarks>The code may get slower depending on how many command did you have.
-    You can always increase `MAX_COMMANDS` by adding `#define MAX_COMMANDS (number)` 
-    to cache more commands before including command-guess.inc</remarks>
-    <returns>This function doesn't have any return types</returns>
+/**
+ *   <summary>This was used for caching the commands as many as possible</summary>
+ *   <param name=""></param>
+ *   <remarks>The code may get slower depending on how many command did you have.
+ *   You can always increase `CGUESS_MAX_CACHE_COMMAND` by adding `#define CGUESS_MAX_CACHE_COMMAND (number)` 
+ *   to cache more commands before including command-guess.inc</remarks>
+ *   <returns>This function doesn't have any return types</returns>
 */
 
 static CGuess_Init()
 {
     #if defined _INC_y_commands
-        for (new i = 0; i < MAX_COMMANDS; i ++)
+        foreach (new i : Command())
         {
             if (Command_IsValid(i))
             {
-                g_sRegisteredCommands ++;
-                format(g_sCommandName[g_sRegisteredCommands], 32, "%s", Command_GetName(i)));
+                // this ensures for loop to be broken
+                // and, no need to continue the loop.
+                if ((g_sRegisteredCommands + 1) >= CGUESS_MAX_CACHE_COMMAND)
+                    break;
+
+                strcopy(g_sCommandName[++g_sRegisteredCommands], Command_GetName(i), 32);
             }
         }
     #else
@@ -310,18 +331,15 @@ static CGuess_Init()
                 tmpName[32 + 1];
 
             GetPublicNameFromIndex(i, tmpName);
-            
-            if ((trimmedPos = CGuess_CheckInternalFunc(tmpName)) == -1)
+
+            if ((trimmedPos = CGuess_CheckInternalFunc(tmpName)) != -1)
             {
-                continue;
-            }
-            else
-            {
-                if (i < MAX_COMMANDS)
-                {
-                    g_sRegisteredCommands ++;
-                    format(g_sCommandName[g_sRegisteredCommands], 32, "%s", tmpName[trimmedPos]);
-                }
+                // this ensures for loop to be broken
+                // and, no need to continue the loop.
+                if ((g_sRegisteredCommands + 1) >= CGUESS_MAX_CACHE_COMMAND)
+                    break;
+                
+                format(g_sCommandName[++g_sRegisteredCommands], 32, "%s", tmpName[trimmedPos]);
             }
         }
     #endif
