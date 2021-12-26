@@ -1,6 +1,6 @@
 # SA:MP Command Guess
 
-[![sampctl](https://img.shields.io/badge/sampctl-command--guess-2f2f2f.svg?style=for-the-badge)](https://github.com/Kirima2nd/samp-command-guess)
+[![sampctl](https://img.shields.io/badge/sampctl-command--guess-2f2f2f.svg?style=for-the-badge)](https://github.com/Se8870/samp-command-guess)
 
 Just simple command guesser for SA-MP using Levenshtein Distance function.
 
@@ -13,7 +13,7 @@ Will working with most of command processor (including y_commands and also disco
 Simply install to your project:
 
 ```bash
-sampctl package install Kirima2nd/samp-command-guess
+sampctl package install Se8870/samp-command-guess
 ```
 
 Include in your code and begin using the library:
