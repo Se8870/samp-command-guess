@@ -13,7 +13,7 @@
 
 #define _INC_guess_command
 
-#if !defined _INC_a_samp
+#if !defined _INC_a_samp || !defined _samp_included
     #error Please include a_samp before using this
 #endif
 
